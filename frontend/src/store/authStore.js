@@ -8,6 +8,7 @@ export const useAuthStore = create((set) => ({
   error: null,
   isAuthenticated: false,
   isCheckingAuth: true,
+  message: null,
 
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
@@ -44,6 +45,114 @@ export const useAuthStore = create((set) => ({
       });
       const data = await response.json();
       set({ isLoading: false, user: data.user, isAuthenticated: true });
+    } catch (error) {
+      set({ isLoading: false, error: error.message });
+      console.log(error);
+      throw error;
+    }
+  },
+
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      set({ isLoading: false, isAuthenticated: true, user: data.user });
+    } catch (error) {
+      set({ isLoading: false, error: error.message });
+      console.log(error);
+      throw error;
+    }
+  },
+
+  checkAuth: async () => {
+    set({ isCheckingAuth: true, error: null });
+    try {
+      const response = await fetch(`${API_URL}/check-auth`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (data.user) {
+        set({ isCheckingAuth: false, isAuthenticated: true, user: data.user });
+      } else {
+        set({ isCheckingAuth: false, isAuthenticated: false, user: null });
+      }
+    } catch (error) {
+      set({
+        isCheckingAuth: false,
+        isAuthenticated: false,
+        user: null,
+      });
+      console.log(error);
+      throw error;
+    }
+  },
+
+  logout: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      // eslint-disable-next-line no-unused-vars
+      const response = await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      set({ isLoading: false, isAuthenticated: false, user: null });
+    } catch (error) {
+      set({ isLoading: false, error: error.message });
+      throw error;
+    }
+  },
+
+  forgotPassword: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_URL}/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      console.log(data.message);
+      set({ isLoading: false, message: data.message });
+    } catch (error) {
+      set({ isLoading: false, error: error.message });
+      console.log(error);
+      throw error;
+    }
+  },
+
+  resetPassword: async (token, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_URL}/reset-password/${token}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ password }),
+      });
+      const data = await response.json();
+      set({ isLoading: false, message: data.message });
     } catch (error) {
       set({ isLoading: false, error: error.message });
       console.log(error);
