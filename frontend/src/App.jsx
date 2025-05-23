@@ -5,12 +5,15 @@ import { VerificationEmailPage } from "./pages/VerificationEmailPage";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
-import DashBoardPage from "./pages/DashBoardPage";
 import { Button } from "./components/ui/button";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import Navbar from "./pages/HomePage/Navbar";
+import Hero from "./pages/HomePage/Hero";
+import Footer from "./pages/HomePage/Footer";
+import DashboardPage from "./pages/DashBoardPage";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -29,7 +32,7 @@ const AuthenticatedUserRoute = ({ children }) => {
 };
 
 function App() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const location = useLocation();
   // eslint-disable-next-line no-unused-vars
   const { isCheckingAuth, checkAuth, isAuthenticated, user, logout } =
@@ -45,16 +48,25 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true }); // prevents going back to /dashboard
-  };
+  // const handleLogout = async () => {
+  //   await logout();
+  //   navigate("/login", { replace: true }); // prevents going back to /dashboard
+  // };
 
   return (
     <div>
-      {user && <Button onClick={handleLogout}>Logout</Button>}
+      {/* {user && <Button onClick={handleLogout}>Logout</Button>} */}
       <Routes>
-        <Route path="/" element={"HOME"}></Route>
+        <Route
+          path="/"
+          element={
+            <div>
+              <Navbar />
+              <Hero />
+              <Footer />
+            </div>
+          }
+        ></Route>
         <Route
           path="/signup"
           element={
@@ -77,7 +89,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashBoardPage />
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
